@@ -2,6 +2,7 @@ package com.challege.backend_jr.service;
 
 import com.challege.backend_jr.entity.Client;
 import com.challege.backend_jr.exception.ClientNotFoundException;
+import com.challege.backend_jr.producer.KafkaProducer;
 import com.challege.backend_jr.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,8 +15,12 @@ public class ClientService {
     @Autowired
     private ClientRepository clientRepository;
 
+    @Autowired
+    private KafkaProducer kafkaProducer;
+
 
     public Client createClient(Client client) {
+        kafkaProducer.sendMessage("Client registered successfully");
         return clientRepository.save(client);
     }
 
