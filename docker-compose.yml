@@ -36,6 +36,18 @@ services:
     environment:
       KAFKA_BROKERCONNECT: kafka:29092
 
+  backend_jr:
+    image: pblda13/backend_jr:1.0.1
+    networks:
+      - broker-kafka
+    depends_on:
+      - kafka
+    ports:
+      - "8100:8100"
+    environment:
+      KAFKA_HOST: kafka:29092
+
+
 networks:
   broker-kafka:
     driver: bridge
