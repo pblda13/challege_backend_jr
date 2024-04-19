@@ -4,10 +4,12 @@ import com.challege.backend_jr.entity.Client;
 import com.challege.backend_jr.exception.ClientNotFoundException;
 import com.challege.backend_jr.producer.KafkaProducer;
 import com.challege.backend_jr.repositories.ClientRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ClientService {
@@ -18,33 +20,36 @@ public class ClientService {
     @Autowired
     private KafkaProducer kafkaProducer;
 
-
+    @Transactional
     public Client createClient(Client client) {
-        kafkaProducer.sendMessage("Client registered successfully");
-        return clientRepository.save(client);
+        Client savedClient = clientRepository.save(client);
+
+        CompletableFuture.runAsync(() -> kafkaProducer.sendMessage("Client registered successfully"));
+        return savedClient;
     }
 
-    public List<Client> getAllClient() {
-        List<Client> clientList = clientRepository.findAll();
-        return clientList;
+    public List<Client> getAllClients() {
+        return clientRepository.findAll();
     }
 
+    @Transactional
     public Client updateClient(Long id, Client client) {
-        Client client1 = clientRepository.findById(id)
-                .orElseThrow(() -> new ClientNotFoundException("Cliente not found with id: " + id));
+        Client existingClient = clientRepository.findById(id)
+                .orElseThrow(() -> new ClientNotFoundException("Client not found with id: " + id));
 
-        client1.setName(client.getName());
-        client1.setUsername(client.getUsername());
-        client1.setPassword(client.getPassword());
-        client1.setContractActive(client.isContractActive());
-        client1.setRole(client.getRole());
+        existingClient.setName(client.getName());
+        existingClient.setUsername(client.getUsername());
+        existingClient.setPassword(client.getPassword());
+        existingClient.setContractActive(client.isContractActive());
+        existingClient.setRole(client.getRole());
 
-        return clientRepository.save(client1);
+        return clientRepository.save(existingClient);
     }
 
-    public void clientDelete(Long id) {
+    @Transactional
+    public void deleteClient(Long id) {
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new ClientNotFoundException("Cliente not found with id: " + id));
+                .orElseThrow(() -> new ClientNotFoundException("Client not found with id: " + id));
         clientRepository.delete(client);
     }
 }

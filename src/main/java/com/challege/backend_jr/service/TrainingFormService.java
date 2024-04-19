@@ -1,53 +1,58 @@
 package com.challege.backend_jr.service;
 
-import com.challege.backend_jr.entity.Teacher;
 import com.challege.backend_jr.entity.TrainingForm;
-import com.challege.backend_jr.exception.TeacherNotFoundException;
-import com.challege.backend_jr.exception.TrainigFormNotFoundException;
+import com.challege.backend_jr.exception.TrainingFormNotFoundException;
 import com.challege.backend_jr.producer.KafkaProducer;
-import com.challege.backend_jr.repositories.TeacherRepository;
 import com.challege.backend_jr.repositories.TrainingFormRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class TrainingFormService {
 
     @Autowired
     private TrainingFormRepository trainingFormRepository;
+
     @Autowired
     private KafkaProducer kafkaProducer;
 
-    public TrainingForm createTrainigForm(TrainingForm trainingForm) {
-        kafkaProducer.sendMessage("TrainigForm registered successfully");
-        return trainingFormRepository.save(trainingForm);
+    @Transactional
+    public TrainingForm createTrainingForm(TrainingForm trainingForm) {
+        TrainingForm savedTrainingForm = trainingFormRepository.save(trainingForm);
+
+        CompletableFuture.runAsync(() -> kafkaProducer.sendMessage("TrainingForm registered successfully"));
+        return savedTrainingForm;
     }
 
-    public List<TrainingForm> getAllTrainigForm() {
-        List<TrainingForm> trainingFormList = trainingFormRepository.findAll();
-        return trainingFormList;
+    public List<TrainingForm> getAllTrainingForms() {
+        return trainingFormRepository.findAll();
     }
 
-    public TrainingForm updateTrainigForm(Long id, TrainingForm trainingForm) {
-        TrainingForm trainingForm1 = trainingFormRepository.findById(id)
-                .orElseThrow(() -> new TrainigFormNotFoundException("TrainigForm not found with id: " + id));
+    @Transactional
+    public TrainingForm updateTrainingForm(Long id, TrainingForm trainingForm) {
+        TrainingForm existingTrainingForm = trainingFormRepository.findById(id)
+                .orElseThrow(() -> new TrainingFormNotFoundException("TrainingForm not found with id: " + id));
 
-        trainingForm1.setClient(trainingForm.getClient());
-        trainingForm1.setTeacher(trainingForm.getTeacher());
-        trainingForm1.setSeries(trainingForm.getSeries());
-        trainingForm1.setDateCreation(trainingForm.getDateCreation());
-        trainingForm1.setExpirationDate(trainingForm.getDateCreation());
+        existingTrainingForm.setClient(trainingForm.getClient());
+        existingTrainingForm.setTeacher(trainingForm.getTeacher());
+        existingTrainingForm.setSeries(trainingForm.getSeries());
+        existingTrainingForm.setDateCreation(trainingForm.getDateCreation());
+        existingTrainingForm.setExpirationDate(trainingForm.getExpirationDate());
 
-        return trainingFormRepository.save(trainingForm1);
+        return trainingFormRepository.save(existingTrainingForm);
     }
 
-    public void trainigFormDelete(Long id) {
+    @Transactional
+    public void deleteTrainingForm(Long id) {
         TrainingForm trainingForm = trainingFormRepository.findById(id)
-                .orElseThrow(() -> new TeacherNotFoundException("TrainigForm not found with id: " + id));
+                .orElseThrow(() -> new TrainingFormNotFoundException("TrainingForm not found with id: " + id));
         trainingFormRepository.delete(trainingForm);
     }
 }
+
 
 

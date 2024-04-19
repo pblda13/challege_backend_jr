@@ -15,32 +15,38 @@ import java.util.List;
 @RequestMapping("/teacher")
 public class TeacherController {
 
-
     @Autowired
     private TeacherService teacherService;
 
-
     @PostMapping
     public ResponseEntity<Teacher> createTeacher(@RequestBody @Valid Teacher teacher) {
-        Teacher newTeacher = teacherService.createTeacher(teacher);
-        return new ResponseEntity(newTeacher, HttpStatus.CREATED);
+        try {
+            Teacher newTeacher = teacherService.createTeacher(teacher);
+            return new ResponseEntity<>(newTeacher, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Teacher> updateTeacher(@PathVariable Long id, @RequestBody Teacher teacher) {
-        Teacher updateTeacher = teacherService.updateTeacher(id, teacher);
-        return ResponseEntity.ok().body(updateTeacher);
+        try {
+            Teacher updatedTeacher = teacherService.updateTeacher(id, teacher);
+            return ResponseEntity.ok().body(updatedTeacher);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping
-    public ResponseEntity<List<Teacher>> ListTeacher() {
-        List<Teacher> teacherList = teacherService.getAllTeacher();
+    public ResponseEntity<List<Teacher>> listTeachers() {
+        List<Teacher> teacherList = teacherService.getAllTeachers();
         return ResponseEntity.ok().body(teacherList);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Teacher> delete(@PathVariable Long id) {
-        teacherService.teacherDelete(id);
+    public ResponseEntity<Void> deleteTeacher(@PathVariable Long id) {
+        teacherService.deleteTeacher(id);
         return ResponseEntity.noContent().build();
     }
 }

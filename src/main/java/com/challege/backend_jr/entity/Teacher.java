@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,14 +32,12 @@ public class Teacher {
     private String username;
 
     @NotBlank
-    @Min(5)
-    @Max(5)
+    @Size(min = 5, max = 255)
     @Column(nullable = false)
     private String password;
 
     @NotBlank
     @Column(nullable = false)
     private RoleEnum role;
-
-
 }
+

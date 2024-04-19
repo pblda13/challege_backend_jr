@@ -17,32 +17,38 @@ import java.util.List;
 @RequestMapping("/exercise")
 public class ExerciseController {
 
-
     @Autowired
     private ExerciseService exerciseService;
 
-
     @PostMapping
     public ResponseEntity<Exercise> createExercise(@RequestBody @Valid Exercise exercise) {
-        Exercise newExercise = exerciseService.createExercise(exercise);
-        return new ResponseEntity(newExercise, HttpStatus.CREATED);
+        try {
+            Exercise newExercise = exerciseService.createExercise(exercise);
+            return new ResponseEntity<>(newExercise, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Exercise> updateExercise (@PathVariable Long id, @RequestBody Exercise exercise) {
-        Exercise updateExercise = exerciseService.updateExercise(id, exercise);
-        return ResponseEntity.ok().body(updateExercise);
+    public ResponseEntity<Exercise> updateExercise(@PathVariable Long id, @RequestBody Exercise exercise) {
+        try {
+            Exercise updatedExercise = exerciseService.updateExercise(id, exercise);
+            return ResponseEntity.ok().body(updatedExercise);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping
-    public ResponseEntity<List<Exercise>> ListExercise() {
-        List<Exercise> exerciseList = exerciseService.getAllExercise();
+    public ResponseEntity<List<Exercise>> listExercises() {
+        List<Exercise> exerciseList = exerciseService.getAllExercises();
         return ResponseEntity.ok().body(exerciseList);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Exercise> delete(@PathVariable Long id) {
-        exerciseService.DeleteExercise(id);
+    public ResponseEntity<Void> deleteExercise(@PathVariable Long id) {
+        exerciseService.deleteExercise(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -4,48 +4,54 @@ import com.challege.backend_jr.entity.Teacher;
 import com.challege.backend_jr.exception.TeacherNotFoundException;
 import com.challege.backend_jr.producer.KafkaProducer;
 import com.challege.backend_jr.repositories.TeacherRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class TeacherService {
 
     @Autowired
     private TeacherRepository teacherRepository;
+
     @Autowired
     private KafkaProducer kafkaProducer;
 
-
+    @Transactional
     public Teacher createTeacher(Teacher teacher) {
-        kafkaProducer.sendMessage("Teacher registered successfully");
-        return teacherRepository.save(teacher);
+        Teacher savedTeacher = teacherRepository.save(teacher);
+
+        CompletableFuture.runAsync(() -> kafkaProducer.sendMessage("Teacher registered successfully"));
+        return savedTeacher;
     }
 
-    public List<Teacher> getAllTeacher() {
-        List<Teacher> teacherList = teacherRepository.findAll();
-        return teacherList;
+    public List<Teacher> getAllTeachers() {
+        return teacherRepository.findAll();
     }
 
+    @Transactional
     public Teacher updateTeacher(Long id, Teacher teacher) {
-        Teacher teacher1 = teacherRepository.findById(id)
+        Teacher existingTeacher = teacherRepository.findById(id)
                 .orElseThrow(() -> new TeacherNotFoundException("Teacher not found with id: " + id));
 
-        teacher1.setName(teacher.getName());
-        teacher1.setUsername(teacher.getUsername());
-        teacher1.setPassword(teacher.getPassword());
-        teacher1.setRole(teacher.getRole());
+        existingTeacher.setName(teacher.getName());
+        existingTeacher.setUsername(teacher.getUsername());
+        existingTeacher.setPassword(teacher.getPassword());
+        existingTeacher.setRole(teacher.getRole());
 
-        return teacherRepository.save(teacher1);
+        return teacherRepository.save(existingTeacher);
     }
 
-    public void
-    teacherDelete(Long id) {
+    @Transactional
+    public void deleteTeacher(Long id) {
         Teacher teacher = teacherRepository.findById(id)
                 .orElseThrow(() -> new TeacherNotFoundException("Teacher not found with id: " + id));
         teacherRepository.delete(teacher);
     }
 }
+
 
 

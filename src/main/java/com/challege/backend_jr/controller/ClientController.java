@@ -17,28 +17,35 @@ public class ClientController {
     @Autowired
     private ClientService clientService;
 
-
     @PostMapping
     public ResponseEntity<Client> createClient(@RequestBody @Valid Client client) {
-        Client newClient = clientService.createClient(client);
-        return new ResponseEntity(newClient, HttpStatus.CREATED);
+        try {
+            Client newClient = clientService.createClient(client);
+            return new ResponseEntity<>(newClient, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Client> updateClient(@PathVariable Long id, @RequestBody Client client) {
-        Client updateClient = clientService.updateClient(id, client);
-        return ResponseEntity.ok().body(updateClient);
+        try {
+            Client updatedClient = clientService.updateClient(id, client);
+            return ResponseEntity.ok().body(updatedClient);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping
-    public ResponseEntity<List<Client>> ListClient() {
-        List<Client> clientList = clientService.getAllClient();
+    public ResponseEntity<List<Client>> listClients() {
+        List<Client> clientList = clientService.getAllClients();
         return ResponseEntity.ok().body(clientList);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Client> delete(@PathVariable Long id) {
-        clientService.clientDelete(id);
+    public ResponseEntity<Void> deleteClient(@PathVariable Long id) {
+        clientService.deleteClient(id);
         return ResponseEntity.noContent().build();
     }
 }

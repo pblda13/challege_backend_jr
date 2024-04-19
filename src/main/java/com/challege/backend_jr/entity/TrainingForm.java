@@ -1,6 +1,7 @@
 package com.challege.backend_jr.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,17 +23,20 @@ public class TrainingForm {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "client_id")
+    @JoinColumn(name = "client_id", nullable = false)
+    @NotNull
     private Client client;
 
     @ManyToOne
-    @JoinColumn(name = "teacher_id")
+    @JoinColumn(name = "teacher_id", nullable = false)
+    @NotNull
     private Teacher teacher;
 
-    @OneToMany(mappedBy = "trainingform", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "trainingForm", cascade = CascadeType.ALL)
     private List<Serie> series;
 
     private LocalDate dateCreation;
 
     private LocalDate expirationDate;
 }
+

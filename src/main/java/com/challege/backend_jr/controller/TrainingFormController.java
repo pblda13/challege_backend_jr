@@ -19,28 +19,36 @@ public class TrainingFormController {
     @Autowired
     private TrainingFormService trainingFormService;
 
-
     @PostMapping
     public ResponseEntity<TrainingForm> createTrainingForm(@RequestBody @Valid TrainingForm trainingForm) {
-        TrainingForm newTrainingForm = trainingFormService.createTrainigForm(trainingForm);
-        return new ResponseEntity(newTrainingForm, HttpStatus.CREATED);
+        try {
+            TrainingForm newTrainingForm = trainingFormService.createTrainingForm(trainingForm);
+            return new ResponseEntity<>(newTrainingForm, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<TrainingForm> updateTrainingForm(@PathVariable Long id, @RequestBody TrainingForm trainingForm) {
-        TrainingForm updateTrainingForm = trainingFormService.updateTrainigForm(id, trainingForm);
-        return ResponseEntity.ok().body(updateTrainingForm);
+        try {
+            TrainingForm updatedTrainingForm = trainingFormService.updateTrainingForm(id, trainingForm);
+            return ResponseEntity.ok().body(updatedTrainingForm);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping
-    public ResponseEntity<List<TrainingForm>> ListTrainingForm() {
-        List<TrainingForm> trainingFormList = trainingFormService.getAllTrainigForm();
+    public ResponseEntity<List<TrainingForm>> listTrainingForms() {
+        List<TrainingForm> trainingFormList = trainingFormService.getAllTrainingForms();
         return ResponseEntity.ok().body(trainingFormList);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<TrainingForm> delete(@PathVariable Long id) {
-        trainingFormService.trainigFormDelete(id);
+    public ResponseEntity<Void> deleteTrainingForm(@PathVariable Long id) {
+        trainingFormService.deleteTrainingForm(id);
         return ResponseEntity.noContent().build();
     }
 }
+

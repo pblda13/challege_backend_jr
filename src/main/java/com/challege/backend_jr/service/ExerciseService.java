@@ -7,10 +7,12 @@ import com.challege.backend_jr.exception.ExerciseNotFoundException;
 import com.challege.backend_jr.producer.KafkaProducer;
 import com.challege.backend_jr.repositories.ClientRepository;
 import com.challege.backend_jr.repositories.ExerciseRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ExerciseService {
@@ -21,28 +23,32 @@ public class ExerciseService {
     @Autowired
     private KafkaProducer kafkaProducer;
 
-
+    @Transactional
     public Exercise createExercise(Exercise exercise) {
-        kafkaProducer.sendMessage("Exercise registered successfully");
-        return exerciseRepository.save(exercise);
+        Exercise savedExercise = exerciseRepository.save(exercise);
+
+        CompletableFuture.runAsync(() -> kafkaProducer.sendMessage("Exercise registered successfully"));
+        return savedExercise;
     }
 
-    public List<Exercise> getAllExercise() {
-        List<Exercise> exerciseList = exerciseRepository.findAll();
-        return exerciseList;
+    public List<Exercise> getAllExercises() {
+        return exerciseRepository.findAll();
     }
 
+    @Transactional
     public Exercise updateExercise(Long id, Exercise exercise) {
-        Exercise exercise1 = exerciseRepository.findById(id)
+        Exercise existingExercise = exerciseRepository.findById(id)
                 .orElseThrow(() -> new ExerciseNotFoundException("Exercise not found with id: " + id));
 
-        exercise1.setName(exercise.getName());
-        exercise1.setDevice(exercise.getDevice());
+        existingExercise.setName(exercise.getName());
+        existingExercise.setDevice(exercise.getDevice());
+        existingExercise.setSerie(exercise.getSerie());
 
-        return exerciseRepository.save(exercise);
+        return exerciseRepository.save(existingExercise);
     }
 
-    public void DeleteExercise(Long id) {
+    @Transactional
+    public void deleteExercise(Long id) {
         Exercise exercise = exerciseRepository.findById(id)
                 .orElseThrow(() -> new ExerciseNotFoundException("Exercise not found with id: " + id));
         exerciseRepository.delete(exercise);

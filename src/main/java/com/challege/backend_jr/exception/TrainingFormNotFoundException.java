@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class TrainigFormNotFoundException extends RuntimeException {
+public class TrainingFormNotFoundException extends RuntimeException {
 
-    public TrainigFormNotFoundException(String message) {
+    public TrainingFormNotFoundException(String message) {
         super(message);
     }
 }

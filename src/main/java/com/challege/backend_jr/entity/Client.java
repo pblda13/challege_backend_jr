@@ -2,9 +2,7 @@ package com.challege.backend_jr.entity;
 
 import com.challege.backend_jr.enums.RoleEnum;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +15,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Client {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,18 +29,15 @@ public class Client {
     private String username;
 
     @NotBlank
-    @Min(5)
-    @Max(5)
+    @Size(min = 5, max = 255)
     @Column(nullable = false)
     private String password;
 
-    @NotBlank
     @Column(nullable = false)
     private boolean contractActive;
 
-    @NotBlank
+    @NotNull
     @Column(nullable = false)
     private RoleEnum role;
-
-
 }
+
