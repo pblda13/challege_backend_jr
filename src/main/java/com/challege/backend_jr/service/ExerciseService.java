@@ -40,10 +40,14 @@ public class ExerciseService {
         Exercise existingExercise = exerciseRepository.findById(id)
                 .orElseThrow(() -> new ExerciseNotFoundException("Exercise not found with id: " + id));
 
+        // Atualiza os campos do exercício existente com base nos valores fornecidos
         existingExercise.setName(exercise.getName());
         existingExercise.setDevice(exercise.getDevice());
-        existingExercise.setSerie(exercise.getSerie());
+        existingExercise.setTrainingForm(exercise.getTrainingForm());
+        existingExercise.setRepetitions(exercise.getRepetitions());
+        existingExercise.setCharge(exercise.getCharge());
 
+        // Salva e retorna o exercício atualizado
         return exerciseRepository.save(existingExercise);
     }
 
@@ -53,4 +57,7 @@ public class ExerciseService {
                 .orElseThrow(() -> new ExerciseNotFoundException("Exercise not found with id: " + id));
         exerciseRepository.delete(exercise);
     }
-}
+    }
+
+
+

@@ -32,8 +32,8 @@ public class TrainingForm {
     @NotNull
     private Teacher teacher;
 
-    @OneToMany(mappedBy = "trainingForm", cascade = CascadeType.ALL)
-    private List<Serie> series;
+    @OneToMany(mappedBy = "trainingform")
+    private List<Exercise> exercises;
 
     private LocalDate dateCreation;
 

@@ -1,6 +1,7 @@
 package com.challege.backend_jr.service;
 
 import com.challege.backend_jr.entity.Client;
+import com.challege.backend_jr.entity.TrainingForm;
 import com.challege.backend_jr.exception.ClientNotFoundException;
 import com.challege.backend_jr.producer.KafkaProducer;
 import com.challege.backend_jr.repositories.ClientRepository;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -31,6 +33,11 @@ public class ClientService {
     public List<Client> getAllClients() {
         return clientRepository.findAll();
     }
+
+    public Optional<Client> getClientById(Long id){
+       return clientRepository.findById(id);
+    }
+
 
     @Transactional
     public Client updateClient(Long id, Client client) {

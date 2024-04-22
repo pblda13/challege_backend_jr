@@ -28,7 +28,11 @@ public class Exercise {
     private String device;
 
     @ManyToOne
-    @JoinColumn(name = "serie_id", nullable = false)
-    private Serie serie;
+    private TrainingForm trainingForm;
+
+    private int repetitions;
+    private int charge;
+
+
 }
 

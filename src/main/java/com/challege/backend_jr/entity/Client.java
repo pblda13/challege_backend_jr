@@ -33,6 +33,11 @@ public class Client {
     @Column(nullable = false)
     private String password;
 
+    @NotBlank
+    @Size(min = 5, max = 255)
+    @Column(nullable = false)
+    private String registration;
+
     @Column(nullable = false)
     private boolean contractActive;
 
