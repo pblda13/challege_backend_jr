@@ -8,6 +8,9 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
@@ -80,4 +83,18 @@ public class TrainingFormController {
         return ResponseEntity.ok(forms);
     }
 
+    @GetMapping("/{id}/client")
+    public ResponseEntity<TrainingForm> getTrainingFormByIdAndClient(@PathVariable Long id, Authentication authentication) throws AccessDeniedException {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        // Verificar se o usuário tem o papel USER
+        if (!userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER"))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Retornar 403 Forbidden para acesso não autorizado
+        }
+
+        // Verificar se o cliente corresponde ao ID do treino
+        ClientRequestDto clientDto = new ClientRequestDto(userDetails.getUsername(), null); // Substitua null pelo campo de matrícula, se necessário
+        TrainingForm form = trainingFormService.getTrainingFormByIdAndClient(id, clientDto);
+        return ResponseEntity.ok(form);
+    }
 }

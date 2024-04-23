@@ -32,7 +32,7 @@ public class TrainingForm {
     @NotNull
     private Teacher teacher;
 
-    @OneToMany(mappedBy = "trainingform")
+    @OneToMany(mappedBy = "trainingForm")
     private List<Exercise> exercises;
 
     private LocalDate dateCreation;
