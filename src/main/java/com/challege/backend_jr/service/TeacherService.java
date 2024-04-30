@@ -41,11 +41,8 @@ public class TeacherService {
     public Teacher updateTeacher(Long id, Teacher teacher) {
         Teacher existingTeacher = teacherRepository.findById(id)
                 .orElseThrow(() -> new TeacherNotFoundException("Teacher not found with id: " + id));
-
         existingTeacher.setName(teacher.getName());
-        existingTeacher.setUsername(teacher.getUsername());
-        existingTeacher.setPassword(teacher.getPassword());
-        existingTeacher.setRole(teacher.getRole());
+
 
         return teacherRepository.save(existingTeacher);
     }

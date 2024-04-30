@@ -24,12 +24,10 @@ public class TrainingForm {
 
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
-    @NotNull
     private Client client;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id", nullable = false)
-    @NotNull
     private Teacher teacher;
 
     @OneToMany(mappedBy = "trainingForm")

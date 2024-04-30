@@ -45,10 +45,8 @@ public class ClientService {
                 .orElseThrow(() -> new ClientNotFoundException("Client not found with id: " + id));
 
         existingClient.setName(client.getName());
-        existingClient.setUsername(client.getUsername());
-        existingClient.setPassword(client.getPassword());
+        existingClient.setRegistration(client.getRegistration());
         existingClient.setContractActive(client.isContractActive());
-        existingClient.setRole(client.getRole());
 
         return clientRepository.save(existingClient);
     }

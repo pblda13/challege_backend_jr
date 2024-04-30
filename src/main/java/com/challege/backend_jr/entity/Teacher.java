@@ -22,6 +22,14 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Teacher extends User {
+public class Teacher {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+
+    @Column(nullable = false)
+    private String name;
 
 }

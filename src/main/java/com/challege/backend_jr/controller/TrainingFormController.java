@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,23 +24,27 @@ public class TrainingFormController {
     @Autowired
     private TrainingFormService trainingFormService;
 
-    @PostMapping
+
+    @PostMapping("/create")
     public ResponseEntity<TrainingForm> createTrainingForm(@Valid @RequestBody TrainingForm trainingForm) {
         TrainingForm createdForm = trainingFormService.createTrainingForm(trainingForm);
         return new ResponseEntity<>(createdForm, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
+
+    @PutMapping("/update/{id}")
     public ResponseEntity<TrainingForm> updateTrainingForm(@PathVariable Long id, @Valid @RequestBody TrainingForm trainingForm) {
         TrainingForm updatedForm = trainingFormService.updateTrainingForm(id, trainingForm);
         return ResponseEntity.ok(updatedForm);
     }
 
-    @DeleteMapping("/{id}")
+
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteTrainingForm(@PathVariable Long id) {
         trainingFormService.deleteTrainingForm(id);
         return ResponseEntity.noContent().build();
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<TrainingForm> getTrainingFormById(@PathVariable Long id) {
@@ -47,54 +52,51 @@ public class TrainingFormController {
         return ResponseEntity.ok(form);
     }
 
-    @PostMapping("/{id}/exercises")
-    public ResponseEntity<TrainingForm> includeExercisesInTrainingForm(@PathVariable Long id, @Valid @RequestBody List<Exercise> exercises) {
-        TrainingForm form = trainingFormService.includeExercisesInTrainingForm(id, exercises);
+
+    @PostMapping("/{id}/add-exercises")
+    public ResponseEntity<TrainingForm> addExercisesToTrainingForm(@PathVariable Long id, @Valid @RequestBody List<Exercise> exercises) {
+        TrainingForm form = trainingFormService.addExercisesToTrainingForm(id, exercises);
         return ResponseEntity.ok(form);
     }
 
-    @PutMapping("/{id}/exercise")
-    public ResponseEntity<TrainingForm> includeExerciseInTrainingForm(@PathVariable Long id, @Valid @RequestBody Exercise exercise) {
-        TrainingForm form = trainingFormService.includeExerciseInTrainingForm(id, exercise);
+
+    @PutMapping("/{id}/add-exercise")
+    public ResponseEntity<TrainingForm> addExerciseToTrainingForm(@PathVariable Long id, @Valid @RequestBody Exercise exercise) {
+        TrainingForm form = trainingFormService.addExerciseToTrainingForm(id, exercise);
         return ResponseEntity.ok(form);
     }
 
-    @PutMapping("/{id}/client")
-    public ResponseEntity<TrainingForm> updateTrainingFormByClient(@PathVariable Long id, @Valid @RequestBody ClientRequestDto clientDto, @RequestBody TrainingForm trainingForm) throws AccessDeniedException {
+    @PutMapping("/{id}/update-by-client")
+    public ResponseEntity<TrainingForm> updateTrainingFormByClient(@PathVariable Long id, @Valid @RequestBody ClientRequestDto clientDto, @Valid @RequestBody TrainingForm trainingForm) throws AccessDeniedException {
         TrainingForm updatedForm = trainingFormService.updateTrainingFormByClient(clientDto, id, trainingForm);
         return ResponseEntity.ok(updatedForm);
     }
 
-    @GetMapping("/client/{name}")
+
+    @GetMapping("/client/by-name/{name}")
     public ResponseEntity<List<TrainingForm>> getTrainingFormsByClientName(@PathVariable String name) {
-        List<TrainingForm> forms = trainingFormService.getTrainingFormByClientName(name);
+        List<TrainingForm> forms = trainingFormService.getTrainingFormsByClientName(name);
         return ResponseEntity.ok(forms);
     }
 
-    @GetMapping("/client/registration/{registration}")
+
+    @GetMapping("/client/by-registration/{registration}")
     public ResponseEntity<List<TrainingForm>> getTrainingFormsByClientRegistration(@PathVariable String registration) {
-        List<TrainingForm> forms = trainingFormService.getTrainingFormByClientRegistration(registration);
+        List<TrainingForm> forms = trainingFormService.getTrainingFormsByClientRegistration(registration);
         return ResponseEntity.ok(forms);
     }
+
 
     @GetMapping("/by-name-and-registration/{name}/{registration}")
     public ResponseEntity<List<TrainingForm>> getTrainingFormsByClientNameAndRegistration(@PathVariable String name, @PathVariable String registration) {
-        List<TrainingForm> forms = trainingFormService.getTrainingFormByClientNameAndRegistration(name, registration);
+        List<TrainingForm> forms = trainingFormService.getTrainingFormsByClientNameAndRegistration(name, registration);
         return ResponseEntity.ok(forms);
     }
 
+
     @GetMapping("/{id}/client")
-    public ResponseEntity<TrainingForm> getTrainingFormByIdAndClient(@PathVariable Long id, Authentication authentication) throws AccessDeniedException {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-        // Verificar se o usuário tem o papel USER
-        if (!userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER"))) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Retornar 403 Forbidden para acesso não autorizado
-        }
-
-        // Verificar se o cliente corresponde ao ID do treino
-        ClientRequestDto clientDto = new ClientRequestDto(userDetails.getUsername(), null); // Substitua null pelo campo de matrícula, se necessário
-        TrainingForm form = trainingFormService.getTrainingFormByIdAndClient(id, clientDto);
+    public ResponseEntity<TrainingForm> getTrainingFormByIdAndClient(@PathVariable Long id, @PathVariable ClientRequestDto clientRequestDto) throws AccessDeniedException {
+        TrainingForm form = trainingFormService.getTrainingFormByIdAndClient(id, clientRequestDto);
         return ResponseEntity.ok(form);
     }
 }

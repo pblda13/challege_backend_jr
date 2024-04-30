@@ -17,9 +17,8 @@ import java.util.Date;
 import java.util.List;
 
 
-@Entity
+@Entity(name = "users")
 @Table(name = "users")
-@Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,43 +28,32 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Column(nullable = false)
-    private String name;
 
-    @NotBlank
+
     @Column(nullable = false, unique = true)
     private String username;
 
-    @NotBlank
+
+
     @Size(min = 5, max = 255)
     @Column(nullable = false)
     private String password;
 
-    @NotBlank
+
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RoleEnum role;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Date createdAt;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_at", nullable = true)
-    private Date updatedAt;
-
-    public User( String username, String password, RoleEnum role) {
+    public User(String username, String password, RoleEnum role) {
         this.username = username;
         this.password = password;
         this.role = role;
     }
 
-
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.role == role.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
+        if (this.role == RoleEnum.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
         else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
     @Override
@@ -83,7 +71,6 @@ public class User implements UserDetails {
     @Override
     public boolean isAccountNonLocked() {
         return true;
-
     }
     @Override
     public boolean isCredentialsNonExpired() {

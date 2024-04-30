@@ -53,12 +53,12 @@ public class TrainingFormService {
         trainingForm.setDateCreation(LocalDate.now());
         trainingForm.setExpirationDate(LocalDate.now().plusMonths(3));
 
-        CompletableFuture.runAsync(() -> kafkaProducer.sendMessage("TrainingForm registered successfully"));
+        CompletableFuture.runAsync(() -> kafkaProducer.sendMessage("Training form registered successfully"));
 
         return trainingFormRepository.save(trainingForm);
     }
 
-    public TrainingForm includeExercisesInTrainingForm(Long id, List<Exercise> exercises) {
+    public TrainingForm addExercisesToTrainingForm(Long id, List<Exercise> exercises) {
         TrainingForm form = trainingFormRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Training form not found with id: " + id));
 
@@ -67,7 +67,7 @@ public class TrainingFormService {
         return trainingFormRepository.save(form);
     }
 
-    public TrainingForm includeExerciseInTrainingForm(Long id, Exercise exercise) {
+    public TrainingForm addExerciseToTrainingForm(Long id, Exercise exercise) {
         TrainingForm form = trainingFormRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Training form not found with id: " + id));
 
@@ -123,16 +123,15 @@ public class TrainingFormService {
         trainingFormRepository.delete(trainingForm);
     }
 
-    public List<TrainingForm> getTrainingFormByClientName(String name) {
+    public List<TrainingForm> getTrainingFormsByClientName(String name) {
         return trainingFormRepository.findByClient_Name(name);
     }
 
-    public List<TrainingForm> getTrainingFormByClientRegistration(String registration) {
+    public List<TrainingForm> getTrainingFormsByClientRegistration(String registration) {
         return trainingFormRepository.findByClient_Registration(registration);
     }
 
-    public List<TrainingForm> getTrainingFormByClientNameAndRegistration(String name, String registration) {
+    public List<TrainingForm> getTrainingFormsByClientNameAndRegistration(String name, String registration) {
         return trainingFormRepository.findByClient_NameAndClient_Registration(name, registration);
     }
-
 }
